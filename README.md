@@ -169,7 +169,7 @@ Number.isNaN('abc') // false / NaN 이 아니다. / 숫자가 아니다.
 
 ## 분기 다루기
 
-### 값(value), 식(eletron), 문(statement)
+### 값(value), 식(expression), 문(statement)
 
 - 값이 들어가야하는 곳에 문이 들어갈 수 없다.
 ```js
@@ -370,6 +370,7 @@ true || undefined ?? "foo"; // raises a SyntaxError
 ```
 
 ### 드모르간의 법칙
+
 ```js
 if (!(A || B)) {
   // 실패
@@ -379,3 +380,292 @@ if (!A && !B) {
   // 실패
 }
 ```
+
+## 배열 Array
+
+### 배열은 객체이다.
+
+- 배열도 key를 통하여 값을 부여할 수 있다. 많은 주의가 필요!
+
+```js
+const arr1 = [1,2,3]
+arr1['mkp'] = 'Hello'
+console.log(arr1.mkp) // 결과값: 'Hello'
+```
+
+- Array.isArray(arr1) // 객체인지 아닌지 확인
+
+```js
+typeof arr1 // "object" 값을 리턴
+Array.isArray(arr1) // true 리턴
+```
+
+### array.length
+
+- 배열의 length 조작하면 값이 삭제되거나 배열에 빈공간이 생긴다. 많은 주의 필요!
+
+```js
+const arr1 = [1,2,3]
+arr1.length = 5;
+console.log(arr1); // [1, 2, 3, , ] / 빈공백이 생긴다.
+
+arr1.length = 0;
+console.log(arr1); // [] / 배열의 값이 없어진다.
+```
+
+### 구조분해 할당
+
+- 구조 분해할당으로 배열의 index 로 접근하는 값들을 줄인다.
+- 배열도 객체이기 때문에, 배열의 순서를 건너 뛰어서도 변수 선언이 가능하다.
+
+```js
+const arr = [
+  'mkp',
+  'kan',
+  'ldk',
+]
+
+const [mkp, , ldk] = arr; // 배열의 기본 구조분해 할당
+const { 0: mkp, 2: ldk } = arr; // obj의 구조분해 할당을 이용해서 배열의 값을 추출
+```
+
+### 유사 배열 객체(array-like object)
+
+- Array.from(arr-like-object): 유사 배열 객체(array-like object)나 반복 가능한 객체(iterable object)를 얕게 복사해 새로운Array 객체생성
+- 유사배열 객체는 array 의 메소드 사용불가! -> Array.from 으로 복제해서 사용.
+
+```js
+const arrLikeObj = {
+  0: 'kan',
+  1: 'mkp',
+  length: 2
+}
+
+console.log(Array.from(arrLikeObj))
+```
+
+### 불변성
+
+- 배열을 복사할시 새로운 배열을 반환하여 사용한다. [deep copy]
+
+### 고차함수
+
+- 고차함수(array 메소드)를 사용하여 임시변수를 사용하지않고 깔끔하게 사용
+- 메소드를 체이닝으로 연결해서 사용해서 명시적으로 사용.
+
+### map 과 foreach 의 차이
+
+- foreach: 리턴값 X, map: 리턴값 O
+- 고차함수에서 continue, breack (조기종료)을 사용안된다. -> forin, forof 문을 사용한다. || every(), some(), find() 등을 사용해서 흐름을 제어한다.
+
+## 객체 object
+
+### Shorthand Properties & Concise Method
+
+```js
+// 예제1) Shorthand Properties
+return {
+  name,
+  age
+}
+
+// 예제2) Concise Method: 함수를 obj 넣을때 '키:' 으로 값을 부여하지 않고 '함수명()' 으로 선언
+const person = {
+  say() {
+    console.log("Hello")
+  }
+}
+```
+
+### Computed Property Name
+
+- obj 에 key 에 동적값(식: expression || 값)을 할당 할 수있다.
+
+```js
+const obj = {
+  ['say' + 'Hello']: "hello" // 키값을 식으로 표현 할 수 있다.
+}
+
+console.log(obj)
+```
+
+### Object Destructuring 객체 구조분해할당
+
+- 함수의 매개변수가 3개 이상일 경우에는 구조분해 할당을 사용하는 것이좋다. (명시적)
+
+```js
+function person(name, age, phone) {
+  
+}
+person('mkp', 34, '000000000');
+
+// 구조분해 할당 명시적인 표현
+function person({name, age, phone}) {
+
+}
+person({name: 'mkp', age: 34, phone: '000000000'});
+```
+
+- 중요한 인자는 순서를 첫번째로 하여 필수적이라는 것을 명시적으로 표현
+
+```js
+// 구조분해 할당 명시적인 표현
+function person(name, {age, phone}) {
+
+}
+person('mkp', {age: 34, phone: '000000000'});
+```
+
+### Object.freeze 객체동결
+
+- 중간에 object 의 프로퍼티를 변경 OR 추가 하더라도 object 가 변하지 않는다.
+- depth 가 한단계 더 진행될 경우 (obj 안의 obj) 보호되지 않는다. 
+
+```js
+const obj = Object.freeze({
+  name: 'mkp',
+  age: 34
+})
+
+obj.name = 'kan';
+
+console.log(obj); // { name: 'mkp', age: 34 } / 값이 변하지 X
+```
+
+### prototype 조작 지양
+
+- JS 몽키패치 언어 이기때문에 기존의 동작을 보장하지 않아 아주 위험하다.
+
+### hasOwnProperty 사용시 call() 이용
+
+- object 의 prototype 에 있는 프로퍼티 명을 보호하지 않기때문에 call() 을 사용
+
+```js
+var foo = {
+  hasOwnProperty: function() {
+    return false;
+  },
+  bar: 'Here be dragons'
+};
+
+foo.hasOwnProperty('bar'); // always returns false
+
+// Use another Object's hasOwnProperty and call it with 'this' set to foo
+({}).hasOwnProperty.call(foo, 'bar'); // true
+
+// It's also possible to use the hasOwnProperty property from the Object prototype for this purpose
+Object.prototype.hasOwnProperty.call(foo, 'bar'); // true
+```
+
+### 프로퍼티 직접 접근 지양
+
+- 타겟 오브젝트가 변경 혹은 프로퍼티 접근시 기능 추가(로그남기기.. 등등) 등등 의 이유로 프로퍼티 직접 접근을 지양.
+
+```js
+const person = {
+  name: 'mkp',
+}
+
+person.name // 바로 접근
+
+// 함수로 접근
+function getName(obj) {
+  // ... 추가기능
+  return obj.name;
+}
+```
+
+## 함수
+
+### 함수의 종류
+
+- 함수, 메서드, 생성자
+
+### argument & parameter
+
+- argument: 함수안에서 실행(호출) 할 때 사용하는 값
+- parameter: 함수를 정의할때 argument 를 사용할때 담는 임시 값
+
+### default parameter
+
+- 기본값을 함수(식)로도 부여할 수 있다.
+
+```js
+function f({name = 'mkp', age = 30 + 4} = {}) {
+  console.log(name, age)
+}
+
+f();
+```
+
+### Rest parameter
+
+- 레스트 파라미터로 파라미터를 받을 경우, Array.from() 같은 메소드를 사용하지 않고 array 메소드를 바로 사용 할 수 있다.
+
+```js
+function f(...arg) {
+  arg.map(
+    v => console.log(v)
+  )
+}
+
+f(1,2,3,4);
+```
+
+### void & return
+
+- void: 함수에 반환이 존재하지 않는다. 
+- 따라서 return 을 사용할 필요가 전혀 없다.
+- 무의미한 return 은 코드를 더욱 복잡하게 만든다.
+
+```js
+function alertMsg() {
+  return alert('경고');
+}
+```
+
+### 자바스크립트 스코프
+
+- 전역 스코프 (Global scope)
+- 지역 스코프 (Local scope or Function-level scope)
+- 렉시컬 스코프 (Lexical scope)
+
+### 화살표 함수
+
+- 화살표함수의 this 는 Lexical scope (렉시컬 스코프) 이다.
+- 따라서 this 가 따로 존재하지 않는다.
+- arguments 가 없다. / rest parameter 사용
+- constructor 가 없다. / 생성자 함수 사용 불가
+- class 내부에서는 화살표함수 사용 X
+- class 내부에서 사용시 생성자가 호출이 될때 함수가 초기화된다.
+- 따라서, 자식 class 내부에서 super 로 사용 X
+- 또, 자식 class 에서 override 불가 (자식 클래스가 생성되면서 부모클래스도 호출이 되는데 그때 우선순위가 부모 클래스인듯?)
+- 제너레이터에서 yield 에서 사용불가. (문법 지원하지 않음)
+
+### 순수함수
+
+- side effect 가 전혀 없는 함수
+- 동일한 parameter 이면 항상 동일한 값을 return 
+
+```js
+const obj = {
+  say: 'hello'
+}
+
+// 원본 obj 의 값이 변하기 때문에 순수함수 X
+function f1(targetObj) {
+  targetObj.say = 'No!';
+
+  return targetObj;
+}
+
+console.log(obj); // hello
+f1(obj);
+console.log(obj); // No!
+
+// 복제한 obj 를 반환하는 순수함수
+function f2(targetObj) {
+  return {...targetObj, say: 'No'};
+}
+```
+

@@ -1,9 +1,19 @@
-const numbers = [1,2,3];
-
-const numObj = {
-  numbers: numbers.map((n, i) => i),
-  say: (false) ? "Good" : "Bad",
-  alert: alert(11);
+const obj = {
+  say: 'hello'
 }
 
-console.log(numObj)
+function f1(targetObj) {
+  targetObj.say = 'No!';
+
+  return targetObj;
+}
+
+
+function f2(targetObj) {
+  return {...targetObj, say: 'No'};
+}
+
+console.log(obj); // hello
+f2(obj);
+console.log(obj); // No!
+
