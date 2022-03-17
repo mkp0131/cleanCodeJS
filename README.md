@@ -669,3 +669,17 @@ function f2(targetObj) {
 }
 ```
 
+### 클로저 Closure
+
+- 클로저(closure)는 내부함수가 외부함수의 맥락(context)에 접근할 수 있는 것
+
+```js
+function add(a) {
+  return function (b) { // 내부함수가 외부함수의 스코프에 접근
+    return a + b;
+  }
+}
+
+add10 = add(10);
+console.log(add10(66));
+```
